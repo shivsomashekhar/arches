@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #ea6100 0%, #ff8c42 100%);
             min-height: 100vh;
             color: #333;
+            overflow-x: hidden;
         }
 
         .container {
@@ -25,6 +26,7 @@
             min-height: 100vh;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
 
         .screen {
@@ -448,7 +450,6 @@
             margin-bottom: 12px;
         }
 
-        /* New Favorites Screen Styles */
         .favorites-grid {
             display: grid;
             gap: 16px;
@@ -512,29 +513,6 @@
             transform: scale(1.1);
         }
 
-        /* Loading animation */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px 0;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #ea6100;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Filter buttons */
         .filter-section {
             display: flex;
             gap: 8px;
@@ -632,11 +610,6 @@
                 <div class="filter-btn" onclick="filterResults('rating')">Highest Rated</div>
                 <div class="filter-btn" onclick="filterResults('price')">Best Value</div>
                 <div class="filter-btn" onclick="filterResults('distance')">Closest</div>
-            </div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Finding the best options...</p>
             </div>
 
             <div id="results-container">
@@ -842,64 +815,283 @@
     </div>
 
     <script>
+        // App state variables
         let currentSearchTerm = '';
         let currentRating = 0;
         let currentItem = null;
         let favorites = new Set();
         let currentResults = [];
-        let currentFilter = 'all';
 
-        const sampleData = {
+        // Sample restaurant data
+        const restaurantData = {
             taco: [
-                {
-                    id: 1,
-                    restaurant: "El Corazón",
-                    distance: "0.2 mi",
-                    rating: 4.8,
-                    reviewCount: 23,
-                    price: "$2.50",
-                    recentReview: "Authentic carnitas, perfect seasoning!",
-                    emoji: "🌮"
-                },
-                {
-                    id: 2,
-                    restaurant: "Tacos El Güero",
-                    distance: "0.4 mi",
-                    rating: 4.6,
-                    reviewCount: 18,
-                    price: "$3.00",
-                    recentReview: "Best fish tacos in the neighborhood",
-                    emoji: "🌮"
-                },
-                {
-                    id: 3,
-                    restaurant: "La Cocina",
-                    distance: "0.6 mi",
-                    rating: 4.9,
-                    reviewCount: 31,
-                    price: "$2.75",
-                    recentReview: "Al pastor is incredible here",
-                    emoji: "🌮"
-                }
+                { id: 1, restaurant: "El Corazón", distance: "0.2 mi", rating: 4.8, reviewCount: 23, price: "$2.50", recentReview: "Authentic carnitas, perfect seasoning!", emoji: "🌮" },
+                { id: 2, restaurant: "Tacos El Güero", distance: "0.4 mi", rating: 4.6, reviewCount: 18, price: "$3.00", recentReview: "Best fish tacos in the neighborhood", emoji: "🌮" },
+                { id: 3, restaurant: "La Cocina", distance: "0.6 mi", rating: 4.9, reviewCount: 31, price: "$2.75", recentReview: "Al pastor is incredible here", emoji: "🌮" }
             ],
             pizza: [
-                {
-                    id: 4,
-                    restaurant: "Tony's Pizza",
-                    distance: "0.1 mi",
-                    rating: 4.7,
-                    reviewCount: 45,
-                    price: "$3.25",
-                    recentReview: "Perfect NY-style slice",
-                    emoji: "🍕"
-                },
-                {
-                    id: 5,
-                    restaurant: "Artisan Slice",
-                    distance: "0.3 mi",
-                    rating: 4.5,
-                    reviewCount: 22,
-                    price: "$4.50",
-                    recentReview: "Creative toppings, great crust",
-                    emoji: "🍕"
+                { id: 4, restaurant: "Tony's Pizza", distance: "0.1 mi", rating: 4.7, reviewCount: 45, price: "$3.25", recentReview: "Perfect NY-style slice", emoji: "🍕" },
+                { id: 5, restaurant: "Artisan Slice", distance: "0.3 mi", rating: 4.5, reviewCount: 22, price: "$4.50", recentReview: "Creative toppings, great crust", emoji: "🍕" }
+            ],
+            coffee: [
+                { id: 6, restaurant: "Blue Bottle Coffee", distance: "0.2 mi", rating: 4.6, reviewCount: 67, price: "$4.50", recentReview: "Smooth espresso, perfect foam", emoji: "☕" }
+            ],
+            burger: [
+                { id: 7, restaurant: "Burger Joint", distance: "0.3 mi", rating: 4.4, reviewCount: 89, price: "$8.50", recentReview: "Juicy patty, great bun", emoji: "🍔" }
+            ],
+            sushi: [
+                { id: 8, restaurant: "Sushi Zen", distance: "0.5 mi", rating: 4.8, reviewCount: 156, price: "$12.00", recentReview: "Fresh fish, perfect rice", emoji: "🍣" }
+            ],
+            wings: [
+                { id: 9, restaurant: "Wing Stop", distance: "0.4 mi", rating: 4.3, reviewCount: 78, price: "$6.50", recentReview: "Crispy wings, great sauce variety", emoji: "🍗" }
+            ]
+        };
+
+        // Sample reviews data
+        const reviewsData = {
+            1: [
+                { name: "Maria L.", date: "2 days ago", rating: 5, text: "Amazing carnitas taco! Meat was perfectly seasoned and the tortilla was fresh and warm." },
+                { name: "Carlos R.", date: "1 week ago", rating: 4, text: "Really good, though the salsa verde could be a bit spicier for my taste." },
+                { name: "Sofia M.", date: "2 weeks ago", rating: 5, text: "I come here every Tuesday for taco night. Consistently excellent quality." }
+            ]
+        };
+
+        // Main app functions
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+
+            const navigation = document.getElementById('navigation');
+            if (['welcome-screen', 'results-screen', 'favorites-screen', 'faq-screen'].includes(screenId)) {
+                navigation.style.display = 'flex';
+            } else {
+                navigation.style.display = 'none';
+            }
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (screenId === 'welcome-screen') {
+                document.querySelector('.nav-item').classList.add('active');
+            } else if (screenId === 'results-screen') {
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if (screenId === 'favorites-screen') {
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            } else if (screenId === 'faq-screen') {
+                document.querySelectorAll('.nav-item')[3].classList.add('active');
+            }
+
+            if (screenId === 'favorites-screen') {
+                updateFavoritesDisplay();
+            }
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('welcome-search').value.toLowerCase().trim() || 'taco';
+            let category = searchTerm;
+            if (searchTerm.includes('taco')) category = 'taco';
+            else if (searchTerm.includes('pizza')) category = 'pizza';
+            else if (searchTerm.includes('coffee')) category = 'coffee';
+            else if (searchTerm.includes('burger')) category = 'burger';
+            else if (searchTerm.includes('sushi')) category = 'sushi';
+            else if (searchTerm.includes('wing')) category = 'wings';
+            else category = 'taco';
+            searchCategory(category);
+        }
+
+        function searchCategory(category) {
+            currentSearchTerm = category;
+            const results = restaurantData[category] || restaurantData.taco;
+            currentResults = [...results];
+            
+            document.getElementById('results-title').textContent = `${category.charAt(0).toUpperCase() + category.slice(1)}s near you`;
+            document.getElementById('results-subtitle').textContent = `Found ${results.length} places with highly rated ${category}s`;
+            
+            displayResults(currentResults);
+            showScreen('results-screen');
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = results.map(item => `
+                <div class="result-card" onclick="showItemDetail(${item.id})">
+                    <div class="result-header">
+                        <div>
+                            <div class="restaurant-name">${item.restaurant}</div>
+                            <div class="distance">${item.distance}</div>
+                        </div>
+                        <div class="rating-container">
+                            <div class="stars">${'★'.repeat(Math.floor(item.rating))}${item.rating % 1 ? '☆' : ''}</div>
+                            <div class="rating-text">${item.rating} (${item.reviewCount})</div>
+                        </div>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">${currentSearchTerm.charAt(0).toUpperCase() + currentSearchTerm.slice(1)}</div>
+                        <div class="item-price">${item.price}</div>
+                    </div>
+                    <div class="recent-review">"${item.recentReview}"</div>
+                </div>
+            `).join('');
+        }
+
+        function filterResults(filterType) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let sortedResults = [...currentResults];
+            
+            switch(filterType) {
+                case 'rating':
+                    sortedResults.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'price':
+                    sortedResults.sort((a, b) => parseFloat(a.price.slice(1)) - parseFloat(b.price.slice(1)));
+                    break;
+                case 'distance':
+                    sortedResults.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+                    break;
+            }
+            
+            displayResults(sortedResults);
+        }
+
+        function showItemDetail(itemId) {
+            const allItems = Object.values(restaurantData).flat();
+            const item = allItems.find(i => i.id === itemId);
+            
+            if (item) {
+                currentItem = item;
+                document.getElementById('detail-image').textContent = item.emoji;
+                document.getElementById('detail-title').textContent = currentSearchTerm.charAt(0).toUpperCase() + currentSearchTerm.slice(1);
+                document.getElementById('detail-subtitle').textContent = `at ${item.restaurant}`;
+                document.getElementById('detail-rating').textContent = item.rating;
+                document.getElementById('detail-price').textContent = item.price;
+                document.getElementById('detail-reviews').textContent = item.reviewCount;
+                
+                const favoriteBtn = document.getElementById('favorite-btn');
+                favoriteBtn.textContent = favorites.has(itemId) ? '❤️' : '🤍';
+                
+                document.getElementById('rating-item-name').textContent = currentSearchTerm.charAt(0).toUpperCase() + currentSearchTerm.slice(1);
+                document.getElementById('rating-restaurant-name').textContent = item.restaurant;
+                
+                const reviewsContainer = document.getElementById('reviews-container');
+                const itemReviews = reviewsData[itemId] || [];
+                reviewsContainer.innerHTML = itemReviews.map(review => `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-name">${review.name}</div>
+                            <div class="review-date">${review.date}</div>
+                        </div>
+                        <div class="rating-container" style="margin-bottom: 8px;">
+                            <div class="stars">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</div>
+                        </div>
+                        <div class="review-text">${review.text}</div>
+                    </div>
+                `).join('');
+                
+                showScreen('detail-screen');
+            }
+        }
+
+        function toggleFavorite() {
+            if (!currentItem) return;
+            
+            const favoriteBtn = document.getElementById('favorite-btn');
+            
+            if (favorites.has(currentItem.id)) {
+                favorites.delete(currentItem.id);
+                favoriteBtn.textContent = '🤍';
+            } else {
+                favorites.add(currentItem.id);
+                favoriteBtn.textContent = '❤️';
+            }
+        }
+
+        function updateFavoritesDisplay() {
+            const favoritesContainer = document.getElementById('favorites-container');
+            const favoritesEmpty = document.getElementById('favorites-empty');
+            
+            if (favorites.size === 0) {
+                favoritesEmpty.style.display = 'block';
+                favoritesContainer.style.display = 'none';
+            } else {
+                favoritesEmpty.style.display = 'none';
+                favoritesContainer.style.display = 'block';
+                
+                const allItems = Object.values(restaurantData).flat();
+                const favoriteItems = allItems.filter(item => favorites.has(item.id));
+                
+                favoritesContainer.innerHTML = favoriteItems.map(item => `
+                    <div class="favorite-card" onclick="showItemDetail(${item.id})">
+                        <div class="favorite-header">
+                            <div class="favorite-emoji">${item.emoji}</div>
+                            <div class="favorite-info">
+                                <div class="favorite-name">${Object.keys(restaurantData).find(key => restaurantData[key].some(i => i.id === item.id))?.charAt(0).toUpperCase() + Object.keys(restaurantData).find(key => restaurantData[key].some(i => i.id === item.id))?.slice(1) || 'Item'}</div>
+                                <div class="favorite-restaurant">at ${item.restaurant}</div>
+                            </div>
+                            <button class="heart-btn" onclick="event.stopPropagation(); toggleFavoriteFromList(${item.id})">❤️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleFavoriteFromList(itemId) {
+            favorites.delete(itemId);
+            updateFavoritesDisplay();
+        }
+
+        // Star rating functionality
+        document.getElementById('star-rating').addEventListener('click', function(e) {
+            if (e.target.classList.contains('star')) {
+                currentRating = parseInt(e.target.dataset.rating);
+                updateStarDisplay();
+                document.getElementById('submit-rating').disabled = false;
+            }
+        });
+
+        function updateStarDisplay() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < currentRating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
                 }
+            });
+        }
+
+        function selectPhoto() {
+            alert('Photo selection would open camera/gallery in a real app');
+        }
+
+        function submitRating() {
+            if (currentRating > 0) {
+                showScreen('success-screen');
+                currentRating = 0;
+                updateStarDisplay();
+                document.getElementById('review-text').value = '';
+                document.getElementById('submit-rating').disabled = true;
+            }
+        }
+
+        function getDirections() {
+            alert('This would open maps with directions in a real app');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('welcome-search').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            document.getElementById('navigation').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
