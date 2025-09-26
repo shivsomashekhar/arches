@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arches - Discover the Best Food</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ea6100 0%, #ff8c42 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .screen {
+            display: none;
+            padding: 20px;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ea6100;
+            margin-bottom: 10px;
+            font-family: 'Georgia', serif;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-style: italic;
+        }
+
+        .search-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #ea6100;
+            box-shadow: 0 0 0 3px rgba(234, 97, 0, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #ea6100;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #d1560a;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .category-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-card:hover {
+            border-color: #ea6100;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .category-emoji {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #ea6100;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .result-card:hover {
+            border-color: #ea6100;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .restaurant-name {
+            font-weight: 700;
+            font-size: 18px;
+            color: #ea6100;
+            margin-bottom: 4px;
+        }
+
+        .distance {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stars {
+            color: #f39c12;
+            font-size: 16px;
+        }
+
+        .rating-text {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .item-info {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #ea6100;
+            margin-bottom: 4px;
+        }
+
+        .item-price {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .recent-review {
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .detail-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .detail-info {
+            margin-bottom: 20px;
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ea6100;
+            margin-bottom: 8px;
+        }
+
+        .detail-subtitle {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ea6100;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        .reviews-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ea6100;
+        }
+
+        .review-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: #ea6100;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .review-text {
+            color: #495057;
+            line-height: 1.4;
+        }
+
+        .rating-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ea6100;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 8px;
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .star {
+            color: #dee2e6;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star.active {
+            color: #f39c12;
+        }
+
+        .star:hover {
+            color: #f39c12;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #ea6100;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            background: white;
+            border-top: 2px solid #e9ecef;
+            display: flex;
+            padding: 12px 0;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-item.active {
+            color: #ea6100;
+            font-weight: 600;
+        }
+
+        .nav-item:hover {
+            color: #ea6100;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ea6100;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .story-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 4px solid #ea6100;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .photo-upload {
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 16px 0;
+        }
+
+        .photo-upload:hover {
+            border-color: #ea6100;
+            background: #f8f9fa;
+        }
+
+        .photo-placeholder {
+            font-size: 48px;
+            color: #dee2e6;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            .screen {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcome-screen">
+            <div class="header">
+                <div class="logo">Arches</div>
+                <div class="subtitle">Discover the best food in your area</div>
+            </div>
+
+            <div class="search-container">
+                <h3 style="margin-bottom: 16px; color: #ea6100;">What are you craving?</h3>
+                <input type="text" class="search-bar" placeholder="Try 'croissant' or 'pizza slice'" id="welcome-search">
+                <button class="btn" onclick="performSearch()">Search Near Me</button>
+            </div>
+
+            <div class="categories">
+                <div class="category-card" onclick="searchCategory('croissant')">
+                    <div class="category-emoji">🥐</div>
+                    <div class="category-name">Pastries</div>
+                </div>
+                <div class="category-card" onclick="searchCategory('pizza')">
+                    <div class="category-emoji">🍕</div>
+                    <div class="category-name">Pizza</div>
+                </div>
+                <div class="category-card" onclick="searchCategory('coffee')">
+                    <div class="category-emoji">☕</div>
+                    <div class="category-name">Coffee</div>
+                </div>
+                <div class="category-card" onclick="searchCategory('burger')">
+                    <div class="category-emoji">🍔</div>
+                    <div class="category-name">Burgers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results Screen -->
+        <div class="screen" id="results-screen">
+            <button class="back-btn" onclick="showScreen('welcome-screen')">← Back to Search</button>
+            
+            <div class="header" style="padding: 20px 0;">
+                <h2 style="color: #ea6100;" id="results-title">Croissants near you</h2>
+                <div class="subtitle">Found 5 places with highly rated croissants</div>
+            </div>
+
+            <div id="results-container">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Item Detail Screen -->
+        <div class="screen" id="detail-screen">
+            <button class="back-btn" onclick="showScreen('results-screen')">← Back to Results</button>
+            
+            <div class="detail-image" id="detail-image">🥐</div>
+            
+            <div class="detail-info">
+                <div class="detail-title" id="detail-title">Butter Croissant</div>
+                <div class="detail-subtitle" id="detail-subtitle">at Café Luna</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="detail-rating">4.8</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="detail-price">$3.50</div>
+                        <div class="stat-label">Price</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="detail-reviews">23</div>
+                        <div class="stat-label">Reviews</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="showScreen('rating-screen')">Rate This Item</button>
+            <button class="btn btn-secondary" onclick="getDirections()">Get Directions</button>
+
+            <div class="reviews-section">
+                <div class="section-title">Recent Reviews</div>
+                <div id="reviews-container">
+                    <!-- Reviews will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Screen -->
+        <div class="screen" id="rating-screen">
+            <button class="back-btn" onclick="showScreen('detail-screen')">← Back</button>
+            
+            <div class="header">
+                <h2 style="color: #ea6100;">Rate This Item</h2>
+                <div class="subtitle">Help others discover great food</div>
+            </div>
+
+            <div class="rating-form">
+                <div class="item-info">
+                    <div class="item-name" id="rating-item-name">Butter Croissant</div>
+                    <div style="color: #7f8c8d;">at <span id="rating-restaurant-name">Café Luna</span></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label">How was it?</div>
+                    <div class="star-rating" id="star-rating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="review-text">Your Review (Optional)</label>
+                    <textarea id="review-text" placeholder="Tell others what made this special..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label">Add a Photo (Optional)</div>
+                    <div class="photo-upload" onclick="selectPhoto()">
+                        <div class="photo-placeholder">📷</div>
+                        <div style="color: #7f8c8d;">Tap to add photo</div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="submitRating()" id="submit-rating" disabled>Submit Rating</button>
+            </div>
+        </div>
+
+        <!-- FAQ Screen -->
+        <div class="screen" id="faq-screen">
+            <button class="back-btn" onclick="showScreen('welcome-screen')">← Back</button>
+            
+            <div class="header">
+                <div class="logo">FAQ</div>
+                <div class="subtitle">Everything about Arches</div>
+            </div>
+
+            <div style="line-height: 1.6; color: #495057;">
+                <div class="story-section">
+                    <h3 style="color: #ea6100; margin-bottom: 16px;">Inspired by Archestratus</h3>
+                    <p style="margin-bottom: 16px;">
+                        Archestratus of Gela (4th century BCE) was the world's first food critic and the author of "Hedypatheia" (Life of Luxury), the earliest known cookbook and food guide.
+                    </p>
+                    <p style="margin-bottom: 16px;">
+                        He traveled across the ancient Mediterranean world, from Sicily to the Black Sea, documenting the finest foods and where to find them. His work was the first systematic approach to food quality and regional specialties.
+                    </p>
+                    <p style="margin-bottom: 16px;">
+                        Today, Arches continues his mission. Instead of one person traveling the world, we use the collective wisdom of local food lovers to discover the best dishes in every neighborhood.
+                    </p>
+                </div>
+
+                <h3 style="color: #ea6100; margin-bottom: 16px;">How does Arches work?</h3>
+                <p style="margin-bottom: 16px;">
+                    • Search for specific food items, not just restaurants<br>
+                    • See ratings for individual dishes at each location<br>
+                    • Discover hidden gems through community recommendations<br>
+                    • Rate and review specific items to help others
+                </p>
+
+                <h3 style="color: #ea6100; margin-bottom: 16px;">Is Arches free to use?</h3>
+                <p style="margin-bottom: 16px;">
+                    Yes! Arches is free to use. You can search for food items, view ratings, and add your own reviews at no cost.
+                </p>
+
+                <h3 style="color: #ea6100; margin-bottom: 16px;">How do I add a review?</h3>
+                <p style="margin-bottom: 16px;">
+                    Simply search for a food item, select the restaurant, and tap "Rate This Item." You can give a star rating and write a short review to help other food lovers.
+                </p>
+
+                <h3 style="color: #ea6100; margin-bottom: 16px;">What makes Arches different?</h3>
+                <p style="margin-bottom: 24px;">
+                    Unlike other apps that focus on restaurants, Arches focuses on specific food items. This means you can find the best croissant in your area, even if it's from a small café that isn't well-known overall.
+                </p>
+            </div>
+
+            <button class="btn" onclick="showScreen('welcome-screen')">Start Discovering</button>
+        </div>
+
+        <!-- Success Screen -->
+        <div class="screen" id="success-screen">
+            <div class="header">
+                <div class="logo">Thank You!</div>
+                <div class="subtitle">Your review helps the community</div>
+            </div>
+
+            <div class="success-message">
+                <h3 style="margin-bottom: 12px;">Rating Submitted Successfully!</h3>
+                <p>Your review of the Butter Croissant at Café Luna has been added to help other food lovers discover great options.</p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
+                <p style="color: #7f8c8d;">Just like Archestratus, you're helping others find exceptional food!</p>
+            </div>
+
+            <button class="btn" onclick="showScreen('welcome-screen')">Discover More Food</button>
+            <button class="btn btn-secondary" onclick="showScreen('results-screen')">Back to Results</button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation" id="navigation" style="display: none;">
+            <div class="nav-item active" onclick="showScreen('welcome-screen')">
+                <div>🔍</div>
+                <div>Search</div>
+            </div>
+            <div class="nav-item" onclick="showScreen('results-screen')">
+                <div>📍</div>
+                <div>Nearby</div>
+            </div>
+            <div class="nav-item">
+                <div>❤️</div>
+                <div>Favorites</div>
+            </div>
+            <div class="nav-item" onclick="showScreen('faq-screen')">
+                <div>❓</div>
+                <div>FAQ</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSearchTerm = '';
+        let currentRating = 0;
+
+        const sampleData = {
+            croissant: [
+                {
+                    id: 1,
+                    restaurant: "Café Luna",
+                    distance: "0.2 mi",
+                    rating: 4.8,
+                    reviewCount: 23,
+                    price: "$3.50",
+                    recentReview: "Perfectly flaky and buttery!",
+                    emoji: "🥐"
+                },
+                {
+                    id: 2,
+                    restaurant: "Morning Glory Bakery",
+                    distance: "0.4 mi",
+                    rating: 4.6,
+                    reviewCount: 18,
+                    price: "$4.00",
+                    recentReview: "Best almond croissant in town",
+                    emoji: "🥐"
+                },
+                {
+                    id: 3,
+                    restaurant: "The French Corner",
+                    distance: "0.6 mi",
+                    rating: 4.9,
+                    reviewCount: 31,
+                    price: "$4.25",
+                    recentReview: "Authentic French technique",
+                    emoji: "🥐"
+                }
+            ],
+            pizza: [
+                {
+                    id: 4,
+                    restaurant: "Tony's Pizza",
+                    distance: "0.1 mi",
+                    rating: 4.7,
+                    reviewCount: 45,
+                    price: "$3.25",
+                    recentReview: "Perfect NY-style slice",
+                    emoji: "🍕"
+                },
+                {
+                    id: 5,
+                    restaurant: "Artisan Slice",
+                    distance: "0.3 mi",
+                    rating: 4.5,
+                    reviewCount: 22,
+                    price: "$4.50",
+                    recentReview: "Creative toppings, great crust",
+                    emoji: "🍕"
+                }
+            ],
+            coffee: [
+                {
+                    id: 6,
+                    restaurant: "Blue Bottle Coffee",
+                    distance: "0.2 mi",
+                    rating: 4.6,
+                    reviewCount: 67,
+                    price: "$4.50",
+                    recentReview: "Smooth espresso, perfect foam",
+                    emoji: "☕"
+                }
+            ]
+        };
+
+        const reviews = {
+            1: [
+                { name: "Sarah M.", date: "2 days ago", rating: 5, text: "Absolutely perfect croissant! Flaky outside, soft inside. Gets my vote for best in the neighborhood." },
+                { name: "Mike R.", date: "1 week ago", rating: 4, text: "Really good, though sometimes they're a bit too buttery for my taste." },
+                { name: "Emma L.", date: "2 weeks ago", rating: 5, text: "I come here every Sunday morning. Consistently excellent quality." }
+            ]
+        };
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+
+            // Show navigation for main screens
+            const navigation = document.getElementById('navigation');
+            if (['welcome-screen', 'results-screen', 'faq-screen'].includes(screenId)) {
+                navigation.style.display = 'flex';
+            } else {
+                navigation.style.display = 'none';
+            }
+
+            // Update navigation active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (screenId === 'welcome-screen') {
+                document.querySelector('.nav-item').classList.add('active');
+            } else if (screenId === 'results-screen') {
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if (screenId === 'faq-screen') {
+                document.querySelectorAll('.nav-item')[3].classList.add('active');
+            }
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('welcome-search').value.toLowerCase().trim() || 'croissant';
+            // Map search terms to our data categories
+            let category = searchTerm;
+            if (searchTerm.includes('croissant') || searchTerm.includes('pastry') || searchTerm.includes('pastries')) {
+                category = 'croissant';
+            } else if (searchTerm.includes('pizza') || searchTerm.includes('slice')) {
+                category = 'pizza';
+            } else if (searchTerm.includes('coffee') || searchTerm.includes('latte') || searchTerm.includes('espresso')) {
+                category = 'coffee';
+            } else if (searchTerm.includes('burger')) {
+                category = 'burger';
+            } else {
+                // Default to croissant for demo
+                category = 'croissant';
+            }
+            searchCategory(category);
+        }
+
+        function searchCategory(category) {
+            currentSearchTerm = category;
+            const results = sampleData[category] || sampleData.croissant;
+            
+            document.getElementById('results-title').textContent = `${category.charAt(0).toUpperCase() + category.slice(1)}s near you`;
+            
+            const container = document.getElementById('results-container');
+            container.innerHTML = results.map(item => `
+                <div class="result-card" onclick="showItemDetail(${item.id})">
+                    <div class="result-header">
+                        <div>
+                            <div class="restaurant-name">${item.restaurant}</div>
+                            <div class="distance">${item.distance}</div>
+                        </div>
+                        <div class="rating-container">
+                            <div class="stars">${'★'.repeat(Math.floor(item.rating))}${item.rating % 1 ? '☆' : ''}</div>
+                            <div class="rating-text">${item.rating} (${item.reviewCount})</div>
+                        </div>
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">${category.charAt(0).toUpperCase() + category.slice(1)}</div>
+                        <div class="item-price">${item.price}</div>
+                    </div>
+                    <div class="recent-review">"${item.recentReview}"</div>
+                </div>
+            `).join('');
+            
+            showScreen('results-screen');
+        }
+
+        function showItemDetail(itemId) {
+            const allItems = [...(sampleData.croissant || []), ...(sampleData.pizza || []), ...(sampleData.coffee || [])];
+            const item = allItems.find(i => i.id === itemId);
+            
+            if (item) {
+                document.getElementById('detail-image').textContent = item.emoji;
+                document.getElementById('detail-title').textContent = currentSearchTerm.charAt(0).toUpperCase() + currentSearchTerm.slice(1);
+                document.getElementById('detail-subtitle').textContent = `at ${item.restaurant}`;
+                document.getElementById('detail-rating').textContent = item.rating;
+                document.getElementById('detail-price').textContent = item.price;
+                document.getElementById('detail-reviews').textContent = item.reviewCount;
+                
+                // Update rating screen info
+                document.getElementById('rating-item-name').textContent = currentSearchTerm.charAt(0).toUpperCase() + currentSearchTerm.slice(1);
+                document.getElementById('rating-restaurant-name').textContent = item.restaurant;
+                
+                // Show reviews
+                const reviewsContainer = document.getElementById('reviews-container');
+                const itemReviews = reviews[itemId] || [];
+                reviewsContainer.innerHTML = itemReviews.map(review => `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-name">${review.name}</div>
+                            <div class="review-date">${review.date}</div>
+                        </div>
+                        <div class="rating-container" style="margin-bottom: 8px;">
+                            <div class="stars">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</div>
+                        </div>
+                        <div class="review-text">${review.text}</div>
+                    </div>
+                `).join('');
+                
+                showScreen('detail-screen');
+            }
+        }
+
+        // Star rating functionality
+        document.getElementById('star-rating').addEventListener('click', function(e) {
+            if (e.target.classList.contains('star')) {
+                currentRating = parseInt(e.target.dataset.rating);
+                updateStarDisplay();
+                document.getElementById('submit-rating').disabled = false;
+            }
+        });
+
+        function updateStarDisplay() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < currentRating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        function selectPhoto() {
+            alert('Photo selection would open camera/gallery in a real app');
+        }
+
+        function submitRating() {
+            if (currentRating > 0) {
+                showScreen('success-screen');
+                // Reset form
+                currentRating = 0;
+                updateStarDisplay();
+                document.getElementById('review-text').value = '';
+                document.getElementById('submit-rating').disabled = true;
+            }
+        }
+
+        function getDirections() {
+            alert('This would open maps with directions in a real app');
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Allow Enter key to search
+            document.getElementById('welcome-search').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
