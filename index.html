@@ -469,15 +469,16 @@
             </div>
 
             <div class="search-container">
-                <h3 style="margin-bottom: 16px; color: #ea6100;">What are you craving?</h3>
-                <input type="text" class="search-bar" placeholder="Try 'croissant' or 'pizza slice'" id="welcome-search">
+                <h3 style="margin-bottom: 8px; color: #ea6100;">What are you craving?</h3>
+                <p style="font-size: 14px; color: #7f8c8d; margin-bottom: 16px;">We will show you the best options!</p>
+                <input type="text" class="search-bar" placeholder="Try 'taco' or 'pizza slice'" id="welcome-search">
                 <button class="btn" onclick="performSearch()">Search Near Me</button>
             </div>
 
             <div class="categories">
-                <div class="category-card" onclick="searchCategory('croissant')">
-                    <div class="category-emoji">🥐</div>
-                    <div class="category-name">Pastries</div>
+                <div class="category-card" onclick="searchCategory('taco')">
+                    <div class="category-emoji">🌮</div>
+                    <div class="category-name">Tacos</div>
                 </div>
                 <div class="category-card" onclick="searchCategory('pizza')">
                     <div class="category-emoji">🍕</div>
@@ -499,8 +500,8 @@
             <button class="back-btn" onclick="showScreen('welcome-screen')">← Back to Search</button>
             
             <div class="header" style="padding: 20px 0;">
-                <h2 style="color: #ea6100;" id="results-title">Croissants near you</h2>
-                <div class="subtitle">Found 5 places with highly rated croissants</div>
+                <h2 style="color: #ea6100;" id="results-title">Tacos near you</h2>
+                <div class="subtitle">Found 3 places with highly rated tacos</div>
             </div>
 
             <div id="results-container">
@@ -512,11 +513,11 @@
         <div class="screen" id="detail-screen">
             <button class="back-btn" onclick="showScreen('results-screen')">← Back to Results</button>
             
-            <div class="detail-image" id="detail-image">🥐</div>
+            <div class="detail-image" id="detail-image">🌮</div>
             
             <div class="detail-info">
-                <div class="detail-title" id="detail-title">Butter Croissant</div>
-                <div class="detail-subtitle" id="detail-subtitle">at Café Luna</div>
+                <div class="detail-title" id="detail-title">Carnitas Taco</div>
+                <div class="detail-subtitle" id="detail-subtitle">at El Corazón</div>
                 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -556,8 +557,8 @@
 
             <div class="rating-form">
                 <div class="item-info">
-                    <div class="item-name" id="rating-item-name">Butter Croissant</div>
-                    <div style="color: #7f8c8d;">at <span id="rating-restaurant-name">Café Luna</span></div>
+                    <div class="item-name" id="rating-item-name">Carnitas Taco</div>
+                    <div style="color: #7f8c8d;">at <span id="rating-restaurant-name">El Corazón</span></div>
                 </div>
 
                 <div class="form-group">
@@ -647,7 +648,7 @@
 
             <div class="success-message">
                 <h3 style="margin-bottom: 12px;">Rating Submitted Successfully!</h3>
-                <p>Your review of the Butter Croissant at Café Luna has been added to help other food lovers discover great options.</p>
+                <p>Your review of the Carnitas Taco at El Corazón has been added to help other food lovers discover great options.</p>
             </div>
 
             <div style="text-align: center; margin: 30px 0;">
@@ -685,36 +686,36 @@
         let currentRating = 0;
 
         const sampleData = {
-            croissant: [
+            taco: [
                 {
                     id: 1,
-                    restaurant: "Café Luna",
+                    restaurant: "El Corazón",
                     distance: "0.2 mi",
                     rating: 4.8,
                     reviewCount: 23,
-                    price: "$3.50",
-                    recentReview: "Perfectly flaky and buttery!",
-                    emoji: "🥐"
+                    price: "$2.50",
+                    recentReview: "Authentic carnitas, perfect seasoning!",
+                    emoji: "🌮"
                 },
                 {
                     id: 2,
-                    restaurant: "Morning Glory Bakery",
+                    restaurant: "Tacos El Güero",
                     distance: "0.4 mi",
                     rating: 4.6,
                     reviewCount: 18,
-                    price: "$4.00",
-                    recentReview: "Best almond croissant in town",
-                    emoji: "🥐"
+                    price: "$3.00",
+                    recentReview: "Best fish tacos in the neighborhood",
+                    emoji: "🌮"
                 },
                 {
                     id: 3,
-                    restaurant: "The French Corner",
+                    restaurant: "La Cocina",
                     distance: "0.6 mi",
                     rating: 4.9,
                     reviewCount: 31,
-                    price: "$4.25",
-                    recentReview: "Authentic French technique",
-                    emoji: "🥐"
+                    price: "$2.75",
+                    recentReview: "Al pastor is incredible here",
+                    emoji: "🌮"
                 }
             ],
             pizza: [
@@ -755,9 +756,9 @@
 
         const reviews = {
             1: [
-                { name: "Sarah M.", date: "2 days ago", rating: 5, text: "Absolutely perfect croissant! Flaky outside, soft inside. Gets my vote for best in the neighborhood." },
-                { name: "Mike R.", date: "1 week ago", rating: 4, text: "Really good, though sometimes they're a bit too buttery for my taste." },
-                { name: "Emma L.", date: "2 weeks ago", rating: 5, text: "I come here every Sunday morning. Consistently excellent quality." }
+                { name: "Maria L.", date: "2 days ago", rating: 5, text: "Amazing carnitas taco! Meat was perfectly seasoned and the tortilla was fresh and warm." },
+                { name: "Carlos R.", date: "1 week ago", rating: 4, text: "Really good, though the salsa verde could be a bit spicier for my taste." },
+                { name: "Sofia M.", date: "2 weeks ago", rating: 5, text: "I come here every Tuesday for taco night. Consistently excellent quality." }
             ]
         };
 
@@ -790,11 +791,11 @@
         }
 
         function performSearch() {
-            const searchTerm = document.getElementById('welcome-search').value.toLowerCase().trim() || 'croissant';
+            const searchTerm = document.getElementById('welcome-search').value.toLowerCase().trim() || 'taco';
             // Map search terms to our data categories
             let category = searchTerm;
-            if (searchTerm.includes('croissant') || searchTerm.includes('pastry') || searchTerm.includes('pastries')) {
-                category = 'croissant';
+            if (searchTerm.includes('taco') || searchTerm.includes('tacos')) {
+                category = 'taco';
             } else if (searchTerm.includes('pizza') || searchTerm.includes('slice')) {
                 category = 'pizza';
             } else if (searchTerm.includes('coffee') || searchTerm.includes('latte') || searchTerm.includes('espresso')) {
@@ -802,15 +803,15 @@
             } else if (searchTerm.includes('burger')) {
                 category = 'burger';
             } else {
-                // Default to croissant for demo
-                category = 'croissant';
+                // Default to taco for demo
+                category = 'taco';
             }
             searchCategory(category);
         }
 
         function searchCategory(category) {
             currentSearchTerm = category;
-            const results = sampleData[category] || sampleData.croissant;
+            const results = sampleData[category] || sampleData.taco;
             
             document.getElementById('results-title').textContent = `${category.charAt(0).toUpperCase() + category.slice(1)}s near you`;
             
