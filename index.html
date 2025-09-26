@@ -154,6 +154,7 @@
         .result-card:hover {
             border-color: #ea6100;
             box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
         }
 
         .result-header {
@@ -447,6 +448,120 @@
             margin-bottom: 12px;
         }
 
+        /* New Favorites Screen Styles */
+        .favorites-grid {
+            display: grid;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .favorite-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .favorite-card:hover {
+            border-color: #ea6100;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .favorite-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .favorite-emoji {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+
+        .favorite-info {
+            flex: 1;
+        }
+
+        .favorite-name {
+            font-weight: 600;
+            color: #ea6100;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .favorite-restaurant {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .heart-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #ea6100;
+            transition: transform 0.2s;
+        }
+
+        .heart-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ea6100;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Filter buttons */
+        .filter-section {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #ea6100;
+            color: white;
+            border-color: #ea6100;
+        }
+
+        .filter-btn:hover {
+            border-color: #ea6100;
+        }
+
         @media (max-width: 480px) {
             .container {
                 max-width: 100%;
@@ -492,6 +607,14 @@
                     <div class="category-emoji">🍔</div>
                     <div class="category-name">Burgers</div>
                 </div>
+                <div class="category-card" onclick="searchCategory('sushi')">
+                    <div class="category-emoji">🍣</div>
+                    <div class="category-name">Sushi</div>
+                </div>
+                <div class="category-card" onclick="searchCategory('wings')">
+                    <div class="category-emoji">🍗</div>
+                    <div class="category-name">Wings</div>
+                </div>
             </div>
         </div>
 
@@ -501,7 +624,19 @@
             
             <div class="header" style="padding: 20px 0;">
                 <h2 style="color: #ea6100;" id="results-title">Tacos near you</h2>
-                <div class="subtitle">Found 3 places with highly rated tacos</div>
+                <div class="subtitle" id="results-subtitle">Found 3 places with highly rated tacos</div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-btn active" onclick="filterResults('all')">All</div>
+                <div class="filter-btn" onclick="filterResults('rating')">Highest Rated</div>
+                <div class="filter-btn" onclick="filterResults('price')">Best Value</div>
+                <div class="filter-btn" onclick="filterResults('distance')">Closest</div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Finding the best options...</p>
             </div>
 
             <div id="results-container">
@@ -516,8 +651,13 @@
             <div class="detail-image" id="detail-image">🌮</div>
             
             <div class="detail-info">
-                <div class="detail-title" id="detail-title">Carnitas Taco</div>
-                <div class="detail-subtitle" id="detail-subtitle">at El Corazón</div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div class="detail-title" id="detail-title">Carnitas Taco</div>
+                        <div class="detail-subtitle" id="detail-subtitle">at El Corazón</div>
+                    </div>
+                    <button class="heart-btn" id="favorite-btn" onclick="toggleFavorite()">🤍</button>
+                </div>
                 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -589,6 +729,25 @@
             </div>
         </div>
 
+        <!-- Favorites Screen -->
+        <div class="screen" id="favorites-screen">
+            <div class="header">
+                <div class="logo">❤️ Favorites</div>
+                <div class="subtitle">Your saved discoveries</div>
+            </div>
+
+            <div id="favorites-empty" style="text-align: center; padding: 60px 20px; color: #7f8c8d;">
+                <div style="font-size: 64px; margin-bottom: 20px;">🤍</div>
+                <h3 style="margin-bottom: 12px; color: #ea6100;">No favorites yet</h3>
+                <p>Start exploring and tap the heart icon on items you love!</p>
+                <button class="btn" onclick="showScreen('welcome-screen')" style="margin-top: 20px; max-width: 200px;">Start Discovering</button>
+            </div>
+
+            <div class="favorites-grid" id="favorites-container">
+                <!-- Favorites will be populated by JavaScript -->
+            </div>
+        </div>
+
         <!-- FAQ Screen -->
         <div class="screen" id="faq-screen">
             <button class="back-btn" onclick="showScreen('welcome-screen')">← Back</button>
@@ -617,12 +776,13 @@
                     • Search for specific food items, not just restaurants<br>
                     • See ratings for individual dishes at each location<br>
                     • Discover hidden gems through community recommendations<br>
-                    • Rate and review specific items to help others
+                    • Rate and review specific items to help others<br>
+                    • Save your favorites for easy access
                 </p>
 
                 <h3 style="color: #ea6100; margin-bottom: 16px;">Is Arches free to use?</h3>
                 <p style="margin-bottom: 16px;">
-                    Yes! Arches is free to use. You can search for food items, view ratings, and add your own reviews at no cost.
+                    Yes! Arches is free to use. You can search for food items, view ratings, save favorites, and add your own reviews at no cost.
                 </p>
 
                 <h3 style="color: #ea6100; margin-bottom: 16px;">How do I add a review?</h3>
@@ -648,7 +808,7 @@
 
             <div class="success-message">
                 <h3 style="margin-bottom: 12px;">Rating Submitted Successfully!</h3>
-                <p>Your review of the Carnitas Taco at El Corazón has been added to help other food lovers discover great options.</p>
+                <p>Your review has been added to help other food lovers discover great options.</p>
             </div>
 
             <div style="text-align: center; margin: 30px 0;">
@@ -661,7 +821,7 @@
         </div>
 
         <!-- Navigation -->
-        <div class="navigation" id="navigation" style="display: none;">
+        <div class="navigation" id="navigation">
             <div class="nav-item active" onclick="showScreen('welcome-screen')">
                 <div>🔍</div>
                 <div>Search</div>
@@ -670,7 +830,7 @@
                 <div>📍</div>
                 <div>Nearby</div>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="showScreen('favorites-screen')">
                 <div>❤️</div>
                 <div>Favorites</div>
             </div>
@@ -684,6 +844,10 @@
     <script>
         let currentSearchTerm = '';
         let currentRating = 0;
+        let currentItem = null;
+        let favorites = new Set();
+        let currentResults = [];
+        let currentFilter = 'all';
 
         const sampleData = {
             taco: [
@@ -739,190 +903,3 @@
                     recentReview: "Creative toppings, great crust",
                     emoji: "🍕"
                 }
-            ],
-            coffee: [
-                {
-                    id: 6,
-                    restaurant: "Blue Bottle Coffee",
-                    distance: "0.2 mi",
-                    rating: 4.6,
-                    reviewCount: 67,
-                    price: "$4.50",
-                    recentReview: "Smooth espresso, perfect foam",
-                    emoji: "☕"
-                }
-            ]
-        };
-
-        const reviews = {
-            1: [
-                { name: "Maria L.", date: "2 days ago", rating: 5, text: "Amazing carnitas taco! Meat was perfectly seasoned and the tortilla was fresh and warm." },
-                { name: "Carlos R.", date: "1 week ago", rating: 4, text: "Really good, though the salsa verde could be a bit spicier for my taste." },
-                { name: "Sofia M.", date: "2 weeks ago", rating: 5, text: "I come here every Tuesday for taco night. Consistently excellent quality." }
-            ]
-        };
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-
-            // Show navigation for main screens
-            const navigation = document.getElementById('navigation');
-            if (['welcome-screen', 'results-screen', 'faq-screen'].includes(screenId)) {
-                navigation.style.display = 'flex';
-            } else {
-                navigation.style.display = 'none';
-            }
-
-            // Update navigation active state
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            if (screenId === 'welcome-screen') {
-                document.querySelector('.nav-item').classList.add('active');
-            } else if (screenId === 'results-screen') {
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-            } else if (screenId === 'faq-screen') {
-                document.querySelectorAll('.nav-item')[3].classList.add('active');
-            }
-        }
-
-        function performSearch() {
-            const searchTerm = document.getElementById('welcome-search').value.toLowerCase().trim() || 'taco';
-            // Map search terms to our data categories
-            let category = searchTerm;
-            if (searchTerm.includes('taco') || searchTerm.includes('tacos')) {
-                category = 'taco';
-            } else if (searchTerm.includes('pizza') || searchTerm.includes('slice')) {
-                category = 'pizza';
-            } else if (searchTerm.includes('coffee') || searchTerm.includes('latte') || searchTerm.includes('espresso')) {
-                category = 'coffee';
-            } else if (searchTerm.includes('burger')) {
-                category = 'burger';
-            } else {
-                // Default to taco for demo
-                category = 'taco';
-            }
-            searchCategory(category);
-        }
-
-        function searchCategory(category) {
-            currentSearchTerm = category;
-            const results = sampleData[category] || sampleData.taco;
-            
-            document.getElementById('results-title').textContent = `${category.charAt(0).toUpperCase() + category.slice(1)}s near you`;
-            
-            const container = document.getElementById('results-container');
-            container.innerHTML = results.map(item => `
-                <div class="result-card" onclick="showItemDetail(${item.id})">
-                    <div class="result-header">
-                        <div>
-                            <div class="restaurant-name">${item.restaurant}</div>
-                            <div class="distance">${item.distance}</div>
-                        </div>
-                        <div class="rating-container">
-                            <div class="stars">${'★'.repeat(Math.floor(item.rating))}${item.rating % 1 ? '☆' : ''}</div>
-                            <div class="rating-text">${item.rating} (${item.reviewCount})</div>
-                        </div>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">${category.charAt(0).toUpperCase() + category.slice(1)}</div>
-                        <div class="item-price">${item.price}</div>
-                    </div>
-                    <div class="recent-review">"${item.recentReview}"</div>
-                </div>
-            `).join('');
-            
-            showScreen('results-screen');
-        }
-
-        function showItemDetail(itemId) {
-            const allItems = [...(sampleData.croissant || []), ...(sampleData.pizza || []), ...(sampleData.coffee || [])];
-            const item = allItems.find(i => i.id === itemId);
-            
-            if (item) {
-                document.getElementById('detail-image').textContent = item.emoji;
-                document.getElementById('detail-title').textContent = currentSearchTerm.charAt(0).toUpperCase() + currentSearchTerm.slice(1);
-                document.getElementById('detail-subtitle').textContent = `at ${item.restaurant}`;
-                document.getElementById('detail-rating').textContent = item.rating;
-                document.getElementById('detail-price').textContent = item.price;
-                document.getElementById('detail-reviews').textContent = item.reviewCount;
-                
-                // Update rating screen info
-                document.getElementById('rating-item-name').textContent = currentSearchTerm.charAt(0).toUpperCase() + currentSearchTerm.slice(1);
-                document.getElementById('rating-restaurant-name').textContent = item.restaurant;
-                
-                // Show reviews
-                const reviewsContainer = document.getElementById('reviews-container');
-                const itemReviews = reviews[itemId] || [];
-                reviewsContainer.innerHTML = itemReviews.map(review => `
-                    <div class="review-card">
-                        <div class="review-header">
-                            <div class="reviewer-name">${review.name}</div>
-                            <div class="review-date">${review.date}</div>
-                        </div>
-                        <div class="rating-container" style="margin-bottom: 8px;">
-                            <div class="stars">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</div>
-                        </div>
-                        <div class="review-text">${review.text}</div>
-                    </div>
-                `).join('');
-                
-                showScreen('detail-screen');
-            }
-        }
-
-        // Star rating functionality
-        document.getElementById('star-rating').addEventListener('click', function(e) {
-            if (e.target.classList.contains('star')) {
-                currentRating = parseInt(e.target.dataset.rating);
-                updateStarDisplay();
-                document.getElementById('submit-rating').disabled = false;
-            }
-        });
-
-        function updateStarDisplay() {
-            const stars = document.querySelectorAll('.star');
-            stars.forEach((star, index) => {
-                if (index < currentRating) {
-                    star.classList.add('active');
-                } else {
-                    star.classList.remove('active');
-                }
-            });
-        }
-
-        function selectPhoto() {
-            alert('Photo selection would open camera/gallery in a real app');
-        }
-
-        function submitRating() {
-            if (currentRating > 0) {
-                showScreen('success-screen');
-                // Reset form
-                currentRating = 0;
-                updateStarDisplay();
-                document.getElementById('review-text').value = '';
-                document.getElementById('submit-rating').disabled = true;
-            }
-        }
-
-        function getDirections() {
-            alert('This would open maps with directions in a real app');
-        }
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            // Allow Enter key to search
-            document.getElementById('welcome-search').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-        });
-    </script>
-</body>
-</html>
